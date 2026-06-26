@@ -1,0 +1,172 @@
+// =====================================================================
+// MPD - Niveau physique PostgreSQL - Tableau de bord intelligent AFI
+// Types PostgreSQL, index, contraintes d unicite.
+// Partitionnement : voir notes en fin (non exprimable en DBML).
+// Import : drawdb.app > Import > DBML
+// =====================================================================
+
+Table dim_reseau {
+  id_reseau    integer      [pk]
+  client_id    varchar(100) [not null]
+  nom_reseau   varchar(255) [not null]
+  type_reseau  varchar(30)  [not null]
+}
+
+Table dim_site {
+  id_site                 integer      [pk]
+  client_id               varchar(100) [not null]
+  id_reseau               integer      [not null]
+  libelle                 varchar(255) [not null]
+  abrege                  varchar(20)
+  population_desservie     integer
+  strate_dll              varchar(50)
+  typologie_etablissement varchar(30)
+
+  indexes {
+    (client_id, id_site) [unique]
+    client_id
+  }
+}
+
+Table dim_abonne {
+  id_abonne          integer      [pk]
+  client_id          varchar(100) [not null]
+  tranche_age        varchar(20)
+  sexe               varchar(10)
+  csp                varchar(100)
+  abonnement_valide  smallint
+
+  indexes {
+    client_id
+  }
+}
+
+Table dim_document {
+  id_document      integer      [pk]
+  client_id        varchar(100) [not null]
+  type_doc         varchar(100)
+  section_libelle  varchar(100)
+  documentaire     varchar(20)
+  isbn             varchar(50)
+
+  indexes {
+    client_id
+  }
+}
+
+Table dim_temps {
+  id_temps       integer      [pk]
+  client_id      varchar(100) [not null]
+  date_complete  timestamp    [not null]
+  annee          integer      [not null]
+  trimestre      integer
+  mois           integer
+  mois_libelle   varchar(20)
+  jour           integer
+  heure          integer
+  jour_semaine   varchar(20)
+
+  indexes {
+    date_complete
+    (client_id, annee)
+  }
+}
+
+Table fait_prets {
+  id_pret         varchar(100) [pk]
+  client_id       varchar(100) [not null]
+  id_abonne       integer
+  id_document     integer
+  id_site         integer
+  id_temps_debut  integer
+  date_pret       timestamp
+  date_retour     timestamp
+  type_pret       varchar(20)
+  source          varchar(20)
+
+  indexes {
+    client_id
+    id_abonne
+    id_site
+    id_temps_debut
+    (client_id, id_temps_debut)
+  }
+}
+
+Table fait_sessions_epn {
+  id_session      integer      [pk]
+  client_id       varchar(100) [not null]
+  id_abonne       integer
+  id_site         integer
+  id_temps_debut  integer
+  id_temps_fin    integer
+  date_in         timestamp
+  date_out        timestamp
+  duree_minutes   integer
+
+  indexes {
+    client_id
+    id_abonne
+    id_site
+  }
+}
+
+Table fait_avis {
+  id_avis      integer      [pk]
+  client_id    varchar(100) [not null]
+  id_document  integer
+  id_abonne    integer
+  id_temps     integer
+  date_avis    timestamp
+  note         integer
+  type_auteur  varchar(20)
+
+  indexes {
+    client_id
+    id_document
+  }
+}
+
+Table dim_geographique {
+  id_geographique          integer      [pk]
+  territoire               varchar(255)
+  strate_dll               varchar(50)
+  typologie_etablissement  varchar(30)
+}
+
+Table fait_benchmark {
+  id_benchmark     integer      [pk]
+  id_geographique  integer      [not null]
+  annee            integer      [not null]
+  indicateur       varchar(100)
+  valeur           decimal(12,2)
+
+  indexes {
+    (id_geographique, annee, indicateur) [unique]
+    annee
+  }
+}
+
+// ----- Relations (faits internes vers dimensions) -----
+Ref: dim_site.id_reseau > dim_reseau.id_reseau
+Ref: fait_prets.id_abonne > dim_abonne.id_abonne
+Ref: fait_prets.id_document > dim_document.id_document
+Ref: fait_prets.id_site > dim_site.id_site
+Ref: fait_prets.id_temps_debut > dim_temps.id_temps
+Ref: fait_sessions_epn.id_abonne > dim_abonne.id_abonne
+Ref: fait_sessions_epn.id_site > dim_site.id_site
+Ref: fait_sessions_epn.id_temps_debut > dim_temps.id_temps
+Ref: fait_sessions_epn.id_temps_fin > dim_temps.id_temps
+Ref: fait_avis.id_document > dim_document.id_document
+Ref: fait_avis.id_abonne > dim_abonne.id_abonne
+Ref: fait_avis.id_temps > dim_temps.id_temps
+
+// ----- Relations (ilot benchmark, separe) -----
+Ref: fait_benchmark.id_geographique > dim_geographique.id_geographique
+
+// =====================================================================
+// PARTITIONNEMENT (a ecrire dans le DDL final, non exprimable en DBML)
+// fait_prets : PARTITION BY LIST (client_id) -> isolation + elagage par tenant.
+//   Sous-partition possible PAR RANGE (date_pret) si un client devient enorme.
+// fait_sessions_epn, fait_avis : petits volumes, pas de partitionnement.
+// =====================================================================

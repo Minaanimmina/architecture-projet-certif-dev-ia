@@ -1,0 +1,123 @@
+// =====================================================================
+// MLD - Niveau logique - Tableau de bord intelligent AFI
+// Tables, cles primaires, cles etrangeres, relations.
+// Types generiques (pas de type physique). Pas d index, pas de partitionnement.
+// Import : drawdb.app > Import > DBML
+// =====================================================================
+
+Table dim_reseau {
+  id_reseau    int          [pk]
+  client_id    varchar      [not null]
+  nom_reseau   varchar      [not null]
+  type_reseau  varchar      [not null]
+}
+
+Table dim_site {
+  id_site                 int     [pk]
+  client_id               varchar [not null]
+  id_reseau               int     [not null]
+  libelle                 varchar [not null]
+  abrege                  varchar
+  population_desservie     int
+  strate_dll              varchar
+  typologie_etablissement varchar
+}
+
+Table dim_abonne {
+  id_abonne          int     [pk]
+  client_id          varchar [not null]
+  tranche_age        varchar
+  sexe               varchar
+  csp                varchar
+  abonnement_valide  int
+}
+
+Table dim_document {
+  id_document      int     [pk]
+  client_id        varchar [not null]
+  type_doc         varchar
+  section_libelle  varchar
+  documentaire     varchar
+  isbn             varchar
+}
+
+Table dim_temps {
+  id_temps       int     [pk]
+  client_id      varchar [not null]
+  date_complete  datetime [not null]
+  annee          int     [not null]
+  trimestre      int
+  mois           int
+  mois_libelle   varchar
+  jour           int
+  heure          int
+  jour_semaine   varchar
+}
+
+Table fait_prets {
+  id_pret         varchar  [pk]
+  client_id       varchar  [not null]
+  id_abonne       int
+  id_document     int
+  id_site         int
+  id_temps_debut  int
+  date_pret       datetime
+  date_retour     datetime
+  type_pret       varchar
+  source          varchar
+}
+
+Table fait_sessions_epn {
+  id_session      int      [pk]
+  client_id       varchar  [not null]
+  id_abonne       int
+  id_site         int
+  id_temps_debut  int
+  id_temps_fin    int
+  date_in         datetime
+  date_out        datetime
+  duree_minutes   int
+}
+
+Table fait_avis {
+  id_avis      int      [pk]
+  client_id    varchar  [not null]
+  id_document  int
+  id_abonne    int
+  id_temps     int
+  date_avis    datetime
+  note         int
+  type_auteur  varchar
+}
+
+Table dim_geographique {
+  id_geographique          int     [pk]
+  territoire               varchar
+  strate_dll               varchar
+  typologie_etablissement  varchar
+}
+
+Table fait_benchmark {
+  id_benchmark     int     [pk]
+  id_geographique  int     [not null]
+  annee            int     [not null]
+  indicateur       varchar
+  valeur           decimal
+}
+
+// ----- Relations (faits internes vers dimensions) -----
+Ref: dim_site.id_reseau > dim_reseau.id_reseau
+Ref: fait_prets.id_abonne > dim_abonne.id_abonne
+Ref: fait_prets.id_document > dim_document.id_document
+Ref: fait_prets.id_site > dim_site.id_site
+Ref: fait_prets.id_temps_debut > dim_temps.id_temps
+Ref: fait_sessions_epn.id_abonne > dim_abonne.id_abonne
+Ref: fait_sessions_epn.id_site > dim_site.id_site
+Ref: fait_sessions_epn.id_temps_debut > dim_temps.id_temps
+Ref: fait_sessions_epn.id_temps_fin > dim_temps.id_temps
+Ref: fait_avis.id_document > dim_document.id_document
+Ref: fait_avis.id_abonne > dim_abonne.id_abonne
+Ref: fait_avis.id_temps > dim_temps.id_temps
+
+// ----- Relations (ilot benchmark, separe des faits internes) -----
+Ref: fait_benchmark.id_geographique > dim_geographique.id_geographique
