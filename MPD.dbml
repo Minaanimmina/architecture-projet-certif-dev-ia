@@ -1,10 +1,9 @@
 // =====================================================================
 // MPD - Niveau physique PostgreSQL - Tableau de bord intelligent AFI
 // Types PostgreSQL, index, contraintes d unicite.
-// Partitionnement : voir notes en fin (non exprimable en DBML).
-// Import : drawdb.app > Import > DBML
 // =====================================================================
 
+// Règle : 1 client = 1 réseau au max ; bibliothèque unique = réseau monosite
 Table dim_reseau {
   id_reseau    integer      [pk]
   client_id    varchar(100) [not null]
@@ -99,7 +98,6 @@ Table fait_sessions_epn {
   id_abonne       integer
   id_site         integer
   id_temps_debut  integer
-  id_temps_fin    integer
   date_in         timestamp
   date_out        timestamp
   duree_minutes   integer
@@ -156,7 +154,6 @@ Ref: fait_prets.id_temps_debut > dim_temps.id_temps
 Ref: fait_sessions_epn.id_abonne > dim_abonne.id_abonne
 Ref: fait_sessions_epn.id_site > dim_site.id_site
 Ref: fait_sessions_epn.id_temps_debut > dim_temps.id_temps
-Ref: fait_sessions_epn.id_temps_fin > dim_temps.id_temps
 Ref: fait_avis.id_document > dim_document.id_document
 Ref: fait_avis.id_abonne > dim_abonne.id_abonne
 Ref: fait_avis.id_temps > dim_temps.id_temps
@@ -164,9 +161,4 @@ Ref: fait_avis.id_temps > dim_temps.id_temps
 // ----- Relations (ilot benchmark, separe) -----
 Ref: fait_benchmark.id_geographique > dim_geographique.id_geographique
 
-// =====================================================================
-// PARTITIONNEMENT (a ecrire dans le DDL final, non exprimable en DBML)
-// fait_prets : PARTITION BY LIST (client_id) -> isolation + elagage par tenant.
-//   Sous-partition possible PAR RANGE (date_pret) si un client devient enorme.
-// fait_sessions_epn, fait_avis : petits volumes, pas de partitionnement.
 // =====================================================================

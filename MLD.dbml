@@ -2,9 +2,11 @@
 // MLD - Niveau logique - Tableau de bord intelligent AFI
 // Tables, cles primaires, cles etrangeres, relations.
 // Types generiques (pas de type physique). Pas d index, pas de partitionnement.
-// Import : drawdb.app > Import > DBML
+// ---------------------------------------------------------------------
+
 // =====================================================================
 
+// Règle : 1 client = 1 réseau au max ; bibliothèque unique = réseau monosite
 Table dim_reseau {
   id_reseau    int          [pk]
   client_id    varchar      [not null]
@@ -73,7 +75,6 @@ Table fait_sessions_epn {
   id_abonne       int
   id_site         int
   id_temps_debut  int
-  id_temps_fin    int
   date_in         datetime
   date_out        datetime
   duree_minutes   int
@@ -114,7 +115,6 @@ Ref: fait_prets.id_temps_debut > dim_temps.id_temps
 Ref: fait_sessions_epn.id_abonne > dim_abonne.id_abonne
 Ref: fait_sessions_epn.id_site > dim_site.id_site
 Ref: fait_sessions_epn.id_temps_debut > dim_temps.id_temps
-Ref: fait_sessions_epn.id_temps_fin > dim_temps.id_temps
 Ref: fait_avis.id_document > dim_document.id_document
 Ref: fait_avis.id_abonne > dim_abonne.id_abonne
 Ref: fait_avis.id_temps > dim_temps.id_temps

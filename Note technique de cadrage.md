@@ -61,6 +61,8 @@ Dans le prolongement de la frontière ci-dessus, il y a deux API REST : l'API do
 
 L'API données n'est pas un composant théorique : elle est consommée au présent par l'application Chainlit, qui l'appelle pour afficher des vues directes (chiffres-clés à l'ouverture, listes de référence) sans solliciter le modèle de langage. Cet usage démontre concrètement l'exploitation exigée par C5. Elle est par ailleurs conçue de façon découplée et documentée (OpenAPI) pour qu'un futur tableau de bord analytique plus complet, porté par AFI, puisse s'y brancher.
 
+L'API données applique une règle d'exposition RGPD en sortie. Elle ne renvoie jamais la dimension abonné au grain individuel : seuls des agrégats (comptes, moyennes) et des listes de référence non personnelles (sites, réseaux, documents, périodes) sont exposés. Tout agrégat ventilé par un attribut sociodémographique (tranche d'age, sexe, CSP) applique un seuil de petit effectif : aucune cellule représentant moins de cinq individus n'est renvoyée, afin d'éviter toute ré-identification par recoupement dans les petites bibliothèques. Cette règle ferme la chaine RGPD côté sortie, en complément de la pseudonymisation appliquée à l'entrée par l'ETL. Elle s'applique de la même façon aux outils du serveur MCP, qui constituent la seconde porte de sortie des données vers l'utilisateur.
+
 ### 2.5 Le classifieur d'intention
 
 Le classifieur est un modèle léger entraîné (type CamemBERT), entraînable sur un GPU local. Il intervient en amont du routage : avant d'appeler le modèle de langage, il trie la question en trois classes.
