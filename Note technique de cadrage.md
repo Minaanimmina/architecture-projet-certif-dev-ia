@@ -88,31 +88,32 @@ DuckDB joue aussi un rôle dans la stratégie de certification : il sert d'équi
 
 Le tableau ci-dessous recense les technologies retenues, l'endroit du projet où chacune intervient, la raison du choix et la ou les compétences qu'elle sert à démontrer.
 
-| Technologie               | Où elle intervient                             | Pourquoi ce choix                                                                                   | Compétences         |     |
-| ------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------- | --- |
-| Python                    | Partout (ETL, API, classifieur, scripts)       | Langage pivot du projet, écosystème data et IA mature                                               | C1, C2, C3, C9, C17 |     |
-| Polars                    | Pipeline ETL (transformation)                  | Traitement de données rapide et économe en mémoire, adapté aux volumes (fait_prets ~2,3M lignes)    | C3                  |     |
-| dbt                       | Pipeline ETL (transformations SQL versionnées) | Structure et documente les transformations analytiques, versionnable                                | C3                  |     |
-| SQLAlchemy                | Pipeline ETL (accès bases)                     | Abstraction d'accès aux bases, facilite la migration vers PostgreSQL                                | C1, C4              |     |
-| PostgreSQL                | Base analytique (stockage)                     | Base relationnelle robuste, adaptée à un produit destiné à des clients                              | C4                  |     |
-| DuckDB                    | Couche de lecture analytique                   | Lecture analytique rapide, lit le Parquet, sert d'équivalent big data pour C1                       | C1                  |     |
-| RustFS + Parquet           | Datalake (conditionnel)                        | Stockage objet open source compatible S3 + format colonnaire ; système big data crédible pour C1    | C1, C4              |     |
-| FastMCP                   | Serveur MCP                                    | Expose les outils d'accès aux données en transport HTTP, avec authentification JWT                  | C8                  |     |
-| FastAPI                   | API données et API IA                          | Framework REST moderne, documentation OpenAPI native, performant                                    | C5, C9              |     |
-| Claude (API)              | Appelé par l'API IA                            | Modèle de langage pour interpréter les questions et formuler les réponses                           | C8, C9              |     |
-| CamemBERT (ou équivalent) | Classifieur d'intention                        | Modèle léger francophone, entraînable sur GPU local, produit des métriques réelles                  | C12, C13            |     |
-| Chainlit                  | Application (interface)                        | Interface conversationnelle en Python pur (pas de JavaScript requis), accessible                    | C17                 |     |
-| JWT                       | API données, API IA, MCP                       | Authentification standard par jetons, gestion de l'expiration                                       | C5, C9, C10         |     |
-| Langfuse                  | Monitoring de l'API IA                         | Observe le comportement du modèle de langage (monitoring LLM spécialisé)                            | C11                 |     |
-| Prometheus + Grafana      | Monitoring de l'application                    | Collecte de métriques et tableaux de bord pour la surveillance applicative                          | C20                 |     |
-| OpenTelemetry (optionnel) | Instrumentation fine                           | Traçabilité détaillée ; passé en optionnel pour alléger la charge                                   | C20                 |     |
-| GitLab CI/CD              | Tous les dépôts (template mutualisé)           | Intégration et livraison continues, template partagé entre les 7 dépôts : lint, types, tests, build, scan de sécurité (bandit/safety), hooks pre-commit. Conventions de commit (Conventional Commits) et stratégie de branches main/develop | C18, C19, C13       |     |
-| Docker Compose            | Orchestration                                  | Assemble et lance les composants ensemble en local et en déploiement                                | C15                 |     |
-| Hetzner ou serveurs AFI   | Déploiement                                    | Hébergement du produit déployé (Hetzner/EasyPanel ou environnement AFI). Le choix d'hébergeur ne change pas la démonstration : ce qui compte est une procédure de déploiement reproductible et documentée | C15, C19            |     |
-| Redmine                   | Pilotage de projet                             | Suivi agile horodaté ; l'historique des tâches est une preuve pour C16                              | C16                 |     |
-| ruff, mypy, pytest-cov    | CI (qualité de code)                           | Linting, vérification de types, couverture de tests, intégrés à la CI                               | C18                 |     |
-| Model Registry GitLab     | Classifieur (stockage du modèle)               | Fonctionnalité native dédiée : versions, artefacts et métriques attachés, liaison au pipeline CI/CD | C12, C13            |     |
-| MLflow                    | Classifieur (suivi d'expériences)              | Journalise les runs d'entraînement (paramètres, métriques)                                          | C12, C13            |     |
+| Technologie                | Où elle intervient                             | Pourquoi ce choix                                                                                   | Compétences         |     |
+| -------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | --- |
+| Python                     | Partout (ETL, API, classifieur, scripts)       | Langage pivot du projet, écosystème data et IA mature                                               | C1, C2, C3, C9, C17 |     |
+| Polars                     | Pipeline ETL (transformation)                  | Traitement de données rapide et économe en mémoire, adapté aux volumes (fait_prets ~2,3M lignes)    | C3                  |     |
+| dbt                        | Pipeline ETL (transformations SQL versionnées) | Structure et documente les transformations analytiques, versionnable                                | C3                  |     |
+| SQLAlchemy                 | Pipeline ETL (accès bases)                     | Abstraction d'accès aux bases, facilite la migration vers PostgreSQL                                | C1, C4              |     |
+| PostgreSQL                 | Base analytique (stockage)                     | Base relationnelle robuste, adaptée à un produit destiné à des clients                              | C4                  |     |
+| DuckDB                     | Couche de lecture analytique                   | Lecture analytique rapide, lit le Parquet, sert d'équivalent big data pour C1                       | C1                  |     |
+| Stockage objet S3 + Parquet | Datalake (conditionnel)                      | Brique S3-compatible open source (Garage, RustFS ou SeaweedFS, arbitrage T008c ; MinIO abandonné, version open source non maintenue depuis février 2026) + format colonnaire ; système big data crédible pour C1 | C1, C4 |     |
+| FastMCP                    | Serveur MCP                                    | Expose les outils d'accès aux données en transport HTTP, avec authentification JWT                  | C8                  |     |
+| FastAPI                    | API données et API IA                          | Framework REST moderne, documentation OpenAPI native, performant                                    | C5, C9              |     |
+| Claude (API)               | Appelé par l'API IA                            | Modèle de langage pour interpréter les questions et formuler les réponses                           | C8, C9              |     |
+| CamemBERT (ou équivalent)  | Classifieur d'intention                        | Modèle léger francophone, entraînable sur GPU local, produit des métriques réelles                  | C12, C13            |     |
+| Chainlit                   | Application (interface)                        | Interface conversationnelle en Python pur (pas de JavaScript requis), accessible                    | C17                 |     |
+| JWT                        | API données, API IA, MCP                       | Authentification standard par jetons, gestion de l'expiration                                       | C5, C9, C10         |     |
+| Langfuse                   | Monitoring de l'API IA                         | Observe le comportement du modèle de langage (monitoring LLM spécialisé)                            | C11                 |     |
+| Prometheus + Grafana       | Monitoring de l'application                    | Collecte de métriques et tableaux de bord pour la surveillance applicative                          | C20                 |     |
+| OpenTelemetry (optionnel)  | Instrumentation fine                           | Traçabilité détaillée ; passé en optionnel pour alléger la charge                                   | C20                 |     |
+| GitLab CI/CD               | Tous les dépôts (template mutualisé)           | Intégration et livraison continues, template partagé entre les 7 dépôts : lint, types, tests, build, scan de sécurité (bandit/safety), hooks pre-commit. Conventions de commit (Conventional Commits) et stratégie de branches main/develop | C18, C19, C13       |     |
+| Docker Compose             | Orchestration                                  | Assemble et lance les composants ensemble en local et en déploiement                                | C15                 |     |
+| Hetzner ou serveurs AFI    | Déploiement                                    | Hébergement du produit déployé (Hetzner/EasyPanel ou environnement AFI). Le choix d'hébergeur ne change pas la démonstration : ce qui compte est une procédure de déploiement reproductible et documentée | C15, C19            |     |
+| Redmine                    | Pilotage de projet                             | Suivi agile horodaté ; l'historique des tâches est une preuve pour C16                              | C16                 |     |
+| ruff, mypy, pytest-cov     | CI (qualité de code)                           | Linting, vérification de types, couverture de tests, intégrés à la CI                               | C18                 |     |
+| Model Registry GitLab      | Classifieur (stockage du modèle)               | Fonctionnalité native dédiée : versions, artefacts et métriques attachés, liaison au pipeline CI/CD | C12, C13            |     |
+| MLflow                     | Classifieur (suivi d'expériences)              | Journalise les runs d'entraînement (paramètres, métriques)                                          | C12, C13            |     |
+
 ### Technologies écartées et raisons (à savoir justifier à l'oral)
 
 | Écartée               | Remplacée par | Raison                                                  |
@@ -138,11 +139,12 @@ Le tableau ci-dessous recense les technologies retenues, l'endroit du projet où
 C'est le flux qui remplit la base analytique. Deux variantes selon la décision datalake :
 
 - **Sans datalake :** le pipeline ETL lit directement les bases de production (ou des sources de repli), transforme les données et charge PostgreSQL.
-- **Avec datalake :** chaque nuit, un script Python extrait les données des bases de production, les anonymise (RGPD), et les dépose au format Parquet dans le datalake (RustFS). Le pipeline ETL lit ensuite ce datalake au lieu des bases de production. La cible (PostgreSQL) est identique dans les deux cas.
+- **Avec datalake :** chaque nuit, un script Python extrait les données des bases de production, les anonymise (RGPD), et les dépose au format Parquet dans le datalake (brique de stockage objet S3-compatible, arbitrage T008c). Le pipeline ETL lit ensuite ce datalake au lieu des bases de production. La cible (PostgreSQL) est identique dans les deux cas.
 
 Le point clé : la partie aval (PostgreSQL et tout ce qui suit) ne change pas selon la variante. Seule la source d'entrée de l'ETL change. C'est ce qui permet de construire le datalake comme une greffe en amont, sans refondre l'existant.
 
 Dans les deux variantes, deux sources externes complètent les bases métier : l'API REST du Ministère de la Culture (indicateurs nationaux des bibliothèques, data.culture.gouv.fr) et un fichier CSV de prêts annuels (réseau BMVR Toulouse, data.toulouse-metropole.fr). Ces sources apportent respectivement la nature "service web API REST" et la nature "fichier de données" exigées par le mix de sources de C1. La comparaison avec la BMVR est limitée aux bibliothèques d'envergure comparable, ce point est documenté dans la doc ETL.
+
 ### 4.3 Le flux de question (temps réel)
 
 Quand un bibliothécaire pose une question, elle traverse les quatre niveaux :
@@ -170,7 +172,7 @@ C1 ne bascule officiellement sur le datalake qu'au **jalon « datalake opératio
 
 La compétence C1 exige une extraction depuis un système big data. Trois éléments peuvent porter cette preuve, par ordre de préférence :
 
-1. **Le datalake** (RustFS + Parquet) : la preuve la plus robuste, mais conditionnelle à la décision tuteur et à sa construction effective.
+1. **Le datalake** (RustFS ou Garage + Parquet) : la preuve la plus robuste, mais conditionnelle à la décision tuteur et à sa construction effective.
 2. **La couche DuckDB** comme équivalent big data : disponible dès la migration, sous réserve de validation du formateur.
 3. **Une quatrième source par scraping** : filet de dernier recours, conservé au backlog en conditionnel, activé seulement si le datalake n'est pas acté et que DuckDB est refusé.
 
@@ -191,7 +193,7 @@ Par tags Git au moment de rédiger chaque dossier d'épreuve, pas comme contrain
 Capacité disponible estimée : environ 486h.
 
 - **Scénario sans datalake :** 467h core+jalon, soit environ 19h de marge brute (≈4 %). Le filet C1 est porté par DuckDB + scraping conditionnel (6h). En intégrant la veille récurrente (24h), la capacité est en réalité pleinement engagée.
-- **Scénario avec datalake acté :** 467h + 34h = 501h, soit un dépassement d'environ 15h sur la capacité. Le retrait du scraping (le datalake porte alors C1) ne rend que 6h et ne suffit pas à revenir à l'équilibre. **Ce scénario n'est tenable que si le temps entreprise augmente sensiblement et/ou si une part de l'optionnel est abandonnée.**
+ - **Scénario avec datalake acté :** 470h + 34h = 504h, soit un dépassement d'environ 18h sur la capacité (porté à environ 21h si RustFS est retenu à l'arbitrage T008c, sa mise en place coûtant ~3h de plus que Garage). Le retrait du scraping (le datalake porte alors C1) ne rend que 6h et ne suffit pas à revenir à l'équilibre. **Ce scénario n'est tenable que si le temps entreprise augmente sensiblement et/ou si une part de l'optionnel est abandonnée.**
 
 Ce qui peut élargir la marge : une augmentation du temps entreprise disponible si le tuteur adhère au projet (probable mais non acquis, donc non intégré dans les chiffres). Ce qui peut la détruire : tout dérapage en sprint 1 ou 2, là où se concentrent migration et datalake.
 
@@ -201,14 +203,16 @@ Ce qui peut élargir la marge : une augmentation du temps entreprise disponible 
 
 ## 7. Risques identifiés
 
-|Risque|Impact|Parade|
-|---|---|---|
-|Datalake acté tard ou jamais, sur une brique jamais construite|C1 fragilisé si on a débranché le filet trop tôt|Jalon TD06 = seul moment de bascule. Filet maintenu jusque-là.|
-|Migration PostgreSQL : régression sur les 9 outils MCP|Périmètre certifiant cassé|Tests de non-régression (TD05, T037) avant toute bascule.|
-|Capacité pleinement engagée sans datalake, dépassement avec datalake|Aucun imprévu absorbable ; périmètre à arbitrer si datalake acté|Tâches optionnelles et compression de la veille comme variables d'ajustement. Arbitrage explicite à la décision datalake.|
-|DuckDB refusé comme big data par le formateur, datalake non acté|C1 sans preuve big data solide|Scraping conditionnel (T013b) comme dernier filet.|
-|Sur-engineering du datalake (feuille blanche)|Explosion de la charge|Cible bornée : RustFS + Parquet, rien de plus lourd (pas de Delta/Iceberg).|
-|Accès jury au GitLab AFI non confirmé|Blocage administratif à la soutenance|À confirmer tôt avec le tuteur, sans urgence mais sans oubli.|
+| Risque                                                               | Impact                                                           | Parade                                                                                                                    |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Datalake acté tard ou jamais, sur une brique jamais construite       | C1 fragilisé si on a débranché le filet trop tôt                 | Jalon TD06 = seul moment de bascule. Filet maintenu jusque-là.                                                            |
+| Migration PostgreSQL : régression sur les 9 outils MCP               | Périmètre certifiant cassé                                       | Tests de non-régression (TD05, T037) avant toute bascule.                                                                 |
+| Capacité pleinement engagée sans datalake, dépassement avec datalake | Aucun imprévu absorbable ; périmètre à arbitrer si datalake acté | Tâches optionnelles et compression de la veille comme variables d'ajustement. Arbitrage explicite à la décision datalake. |
+| DuckDB refusé comme big data par le formateur, datalake non acté     | C1 sans preuve big data solide                                   | Scraping conditionnel (T013b) comme dernier filet.                                                                        |
+| Sur-engineering du datalake (feuille blanche)                        | Explosion de la charge                                           | Cible bornée : RustFS ou Garage + Parquet, rien de plus lourd (pas de Delta/Iceberg).                                     |
+|Brique de stockage retenue jeune ou peu documentée (RustFS non production-ready en 2026)|Dérapage install, validation S3 incertaine|Arbitrage T008c documenté ; Garage privilégié (production depuis 2020) ; charge TD01 majorée de 3h si RustFS|
+|Licence AGPL-3.0 de Garage sur un produit destiné à des clients|Contrainte juridique si la brique était modifiée et exposée comme service|Usage interne non modifié (pas de déclenchement de l'obligation AGPL) ; alternative Apache 2.0 (SeaweedFS) instruite en T008c|
+| Accès jury au GitLab AFI non confirmé                                | Blocage administratif à la soutenance                            | À confirmer tôt avec le tuteur, sans urgence mais sans oubli.                                                             |
 
 ---
 
